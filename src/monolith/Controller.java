@@ -18,6 +18,7 @@ public class Controller extends WindowAdapter implements ActionListener, Compone
 	public Controller(Model model) {
 		// TODO 自動生成されたコンストラクター・スタブ
 		this.model = model;
+		System.out.println("Controller: "+ model);
 	}
 
 	public void actionPerformed(ActionEvent actionEvent) {
@@ -25,8 +26,9 @@ public class Controller extends WindowAdapter implements ActionListener, Compone
 			System.out.println("inc");
 			model.inc();
 		} else {
-			model.dec();
-			System.out.println(actionEvent.getActionCommand());
+			Block block = (Block)(actionEvent.getSource());
+			block.Dig(model);
+			//model.dec();
 		}
 	}
 
@@ -43,33 +45,38 @@ public class Controller extends WindowAdapter implements ActionListener, Compone
 		}
 	}
 
+	public Model getModel() {
+		return this.model;
+	}
+
 	@Override
 	public void componentResized(ComponentEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
 		View view = (View)e.getComponent();
-		Block square = view.square[0][0];
+		Model model = view.getModel();
+		Block square = model.square[0][0];
 		Dimension size = square.getSize();
         Image scaled;
 
 		for(int c = 0; c < Main.column; c++){
 			for(int r = 0; r < Main.row; r++) {
-				square = view.square[c][r];
+				square = model.square[r][c];
 
 				switch(square.getColor()) {
 			    case 1:
-  			          scaled = view.img1.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+  			          scaled = model.img1.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
 					  break;
 			    case 2:
-			          scaled = view.img2.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+			          scaled = model.img2.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
 			    	  break;
 			    case 3:
-			          scaled = view.img3.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+			          scaled = model.img3.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
 					  break;
 			    case 4:
-			          scaled = view.img4.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+			          scaled = model.img4.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
 					  break;
 			    default:
-			          scaled = view.img0.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+			          scaled = model.img0.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
 					  break;
 			    }
 		        square.setIcon(new ImageIcon(scaled));

@@ -1,71 +1,50 @@
 package monolith;
 
 import java.util.Observer;
-import java.util.Random;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.util.Observable;
 
 public class View extends JFrame implements Observer {
 	private static final long serialVersionUID = 1L;
-	JLabel status = new JLabel("ステータスバー：ここに文字が出力されます。");
+
 	JPanel board = new JPanel();
 	JPanel header = new JPanel();
 	TimeLabel label = new TimeLabel();
 	ScoreLabel score = new ScoreLabel();
-	Block square[][] = new Block[Main.column][Main.row];
-	public BufferedImage img0;
-	public BufferedImage img1;
-	public BufferedImage img2;
-	public BufferedImage img3;
-	public BufferedImage img4;
+	MenuBar menubar = new MenuBar();
+	StatusLabel status = new StatusLabel();
+	Model model;
+	int width = 0;
+	int height = 0;
 
 	public View (Controller aController) {
-		MenuBar menubar = new MenuBar();
-
-
+		model = aController.getModel();
 		board.setLayout(new GridLayout(Main.column, Main.row));
 		header.setLayout(new GridLayout(1, 6));
-		try {
-			img0 = ImageIO.read(getClass().getResourceAsStream("/zero.png"));
-			img1 = ImageIO.read(getClass().getResourceAsStream("/one.png"));
-			img2 = ImageIO.read(getClass().getResourceAsStream("/two.png"));
-			img3 = ImageIO.read(getClass().getResourceAsStream("/three.png"));
-			img4 = ImageIO.read(getClass().getResourceAsStream("/four.png"));
-	    } catch (Exception ex) {
-		    System.out.println(ex);
-		    System.exit(1);
-		}
 
 		for(int c = 0; c < Main.column; c++){
 			for(int r = 0; r < Main.row; r++) {
-		      square[c][r] = new Block();//Buttonの生成
-		      square[c][r].setPreferredSize(new Dimension(31, 31));
-		      square[c][r].setBackground(Color.BLACK);
-		      generateRandom(square[c][r], Main.max_colors);
-		      switch(square[c][r].getColor()) {
+//			  square[c][r].setActionCommand(c + "," + r);		/* ActoinListener用のコマンド作成 */
+		      board.add(model.square[r][c]);//生成したボタンをパネルに追加
+		      switch(model.square[r][c].getColor()) {
 		      case 1:
-				  square[c][r].setIcon(new ImageIcon(img1));
+				  model.square[r][c].setIcon(new ImageIcon(model.img1));
 				  break;
 		      case 2:
-				  square[c][r].setIcon(new ImageIcon(img2));
+				  model.square[r][c].setIcon(new ImageIcon(model.img2));
 				  break;
 		      case 3:
-				  square[c][r].setIcon(new ImageIcon(img3));
+				  model.square[r][c].setIcon(new ImageIcon(model.img3));
 				  break;
 		      case 4:
-				  square[c][r].setIcon(new ImageIcon(img4));
+				  model.square[r][c].setIcon(new ImageIcon(model.img4));
 				  break;
 		     default:
-				  square[c][r].setIcon(new ImageIcon(img0));
+				  model.square[r][c].setIcon(new ImageIcon(model.img0));
 				  break;
 		      }
-			  square[c][r].setActionCommand(c + "," + r);		/* ActoinListener用のコマンド作成 */
-		      board.add(square[c][r]);//生成したボタンをパネルに追加
-			  square[c][r].addActionListener(aController);
+			  model.square[r][c].addActionListener(aController);
 		    }
 		}
 
@@ -86,8 +65,6 @@ public class View extends JFrame implements Observer {
 
 
 		this.addComponentListener(aController);
-
-//		this.add(value, BorderLayout.CENTER);
 		this.setTitle("ダンガンロンパv3 お宝発見！モノリス");
 
 		this.addWindowListener(aController);
@@ -114,15 +91,53 @@ public class View extends JFrame implements Observer {
          Menu1.add(closem);
 	}
 
-	private void generateRandom(Block b, int range) {
-	    Random rand = new Random();
-		b.setColor(rand.nextInt(range) + 1);
+	public Model getModel() {
+		return this.model;
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO 自動生成されたメソッド・スタブ
 		score.setText(Integer.toString(((Model)o).getScore()));
-		System.out.println(((Model)o).getScore());
+
+		for(int c = 0; c < Main.column; c++){
+			for(int r = 0; r < Main.row; r++) {
+				System.out.print(model.square[r][c].getColor() + " ");
+			}
+			System.out.println();
+		}
+		System.out.println();
+
+		View view = this;
+		Model model = view.getModel();
+		Block square = model.square[0][0];
+		Dimension size = square.getSize();
+        Image scaled;
+
+		for(int c = 0; c < Main.column; c++){
+			for(int r = 0; r < Main.row; r++) {
+				square = model.square[r][c];
+
+				switch(square.getColor()) {
+			    case 1:
+  			          scaled = model.img1.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+					  break;
+			    case 2:
+			          scaled = model.img2.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+			    	  break;
+			    case 3:
+			          scaled = model.img3.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+					  break;
+			    case 4:
+			          scaled = model.img4.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+					  break;
+			    default:
+			          scaled = model.img0.getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+					  break;
+			    }
+		        square.setIcon(new ImageIcon(scaled));
+		        view.repaint();
+		    }
+		}
 	}
 }
