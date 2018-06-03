@@ -4,6 +4,9 @@ public class Main {
 	public static final int row = 18; //　行
 	public static final int column = 11;  // 列
 	public static final int max_colors = 4; //　色種類
+	public static final int blockscore = 5; // ブロック一個当たりのスコア
+	public static final String default_font10 = "PixelMplus10";
+	public static final String default_font12 = "PixelMplus12";
 
 	public static void main(String[] args) {
 		// TODO 自動生成されたメソッド・スタブ

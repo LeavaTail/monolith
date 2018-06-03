@@ -18,17 +18,14 @@ public class Controller extends WindowAdapter implements ActionListener, Compone
 	public Controller(Model model) {
 		// TODO 自動生成されたコンストラクター・スタブ
 		this.model = model;
-		System.out.println("Controller: "+ model);
 	}
 
 	public void actionPerformed(ActionEvent actionEvent) {
 		if(actionEvent.getActionCommand() == "inc") {
-			System.out.println("inc");
 			model.inc();
 		} else {
 			Block block = (Block)(actionEvent.getSource());
 			block.Dig(model);
-			//model.dec();
 		}
 	}
 

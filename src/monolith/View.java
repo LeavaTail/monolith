@@ -10,23 +10,28 @@ public class View extends JFrame implements Observer {
 
 	JPanel board = new JPanel();
 	JPanel header = new JPanel();
-	TimeLabel label = new TimeLabel();
-	ScoreLabel score = new ScoreLabel();
-	MenuBar menubar = new MenuBar();
-	StatusLabel status = new StatusLabel();
+	TimeLabel label;
+	ScoreLabel score;
+	MenuBar menubar;
+	StatusBar status;
 	Model model;
 	int width = 0;
 	int height = 0;
 
 	public View (Controller aController) {
 		model = aController.getModel();
+		status = new StatusBar(model);
+		score = new ScoreLabel(model);
+		label = new TimeLabel(model);
+		menubar = new MenuBar();
+
 		board.setLayout(new GridLayout(Main.column, Main.row));
 		header.setLayout(new GridLayout(1, 6));
 
 		for(int c = 0; c < Main.column; c++){
 			for(int r = 0; r < Main.row; r++) {
 //			  square[c][r].setActionCommand(c + "," + r);		/* ActoinListener用のコマンド作成 */
-		      board.add(model.square[r][c]);//生成したボタンをパネルに追加
+		      board.add(model.square[r][c]);
 		      switch(model.square[r][c].getColor()) {
 		      case 1:
 				  model.square[r][c].setIcon(new ImageIcon(model.img1));
@@ -99,14 +104,6 @@ public class View extends JFrame implements Observer {
 	public void update(Observable o, Object arg) {
 		// TODO 自動生成されたメソッド・スタブ
 		score.setText(Integer.toString(((Model)o).getScore()));
-
-		for(int c = 0; c < Main.column; c++){
-			for(int r = 0; r < Main.row; r++) {
-				System.out.print(model.square[r][c].getColor() + " ");
-			}
-			System.out.println();
-		}
-		System.out.println();
 
 		View view = this;
 		Model model = view.getModel();

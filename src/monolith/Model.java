@@ -1,5 +1,6 @@
 package monolith;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,8 +20,14 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 public class Model extends Observable {
+	public int default_status_size = 32;
+	public int default_score_size = 28;
+	public int max_time = 600000; // 制限時間
+
 	private int score;
 	Block square[][] = new Block[Main.row][Main.column];
 	public BufferedImage img0;
@@ -28,6 +35,7 @@ public class Model extends Observable {
 	public BufferedImage img2;
 	public BufferedImage img3;
 	public BufferedImage img4;
+
 
 	public Model() {
 		this(0);
@@ -52,7 +60,7 @@ public class Model extends Observable {
 	public void initBoard() {
 		for(int c = 0; c < Main.column; c++){
 			for(int r = 0; r < Main.row; r++) {
-		      square[r][c] = new Block();//Buttonの生成
+		      square[r][c] = new Block();
 		      square[r][c].setPoint(r, c);
 		      square[r][c].setPreferredSize(new Dimension(32, 32));
 		      square[r][c].setBackground(Color.BLACK);
@@ -65,6 +73,16 @@ public class Model extends Observable {
 		return score;
 	}
 
+	public void printBoard(Model model) {
+		for(int c = 0; c < Main.column; c++){
+			for(int r = 0; r < Main.row; r++) {
+				System.out.print(model.square[r][c].getColor() + " ");
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+
 	public void setScore(int score) {
 		this.score = score;
 		setChanged();
@@ -72,7 +90,7 @@ public class Model extends Observable {
 	}
 
 	public int inc() {
-		return inc(5);
+		return inc(Main.blockscore);
 	}
 
 	public int inc(int score)  {
@@ -81,7 +99,7 @@ public class Model extends Observable {
 	}
 
 	public int dec() {
-		return dec(5);
+		return dec(Main.blockscore);
 	}
 
 	public int dec(int score)  {
@@ -128,91 +146,162 @@ class Block extends JButton {
 		return false;
 	}
 
+	/*
+	 * is block specified color?
+	 * @filter: specified color. if filter less than -1, get all ambient block
+	 * */
+	public Boolean checkFilter(int filter) {
+		if(this.color > 0 && filter < 0) return true;
+		if(this.color == filter) return true;
+		return false;
+	}
+
 	public Boolean chengeBlock(int color) {
 		if(this.color == 0) return false;
 		this.color = color;
 		return true;
 	}
 
-	private int cheakDig(HashSet<Point> available, Model model, Point point, int color, int num) {
-		int x = point.x;
-		int y = point.y;
+	/*
+	 * Get A set of same color Ambient block "p"
+	 * @ambient: A Set of Ambient block "p"
+	 * @model: Present board
+	 * @p: search target
+	 * @filter: Get only specified color. if filter less than -1, get all ambient block
+	 * */
+	private void getAmbientBlock(HashSet<Point> ambient, Model model, Point p, int filter) {
+		Block b;
+		int x = p.x;
+		int y = p.y;
 
-		if(model.square[x][y].getColor() == 0) {
-			System.out.println("unable dig");
-			return num;
+		if(y - 1 >= 0) {
+			b = model.square[x][y-1];
+			if(b.checkFilter(filter)) {
+				ambient.add(new Point(x, y-1));
+			}
 		}
-		// 上
-		if(y - 1 >= 0)
-			if(model.square[x][y-1].checkColor(color)) {
-				Point p = new Point(x, y-1);
-				if(available.add(p)) {
-					cheakDig(available, model, p, color, ++num);
-				}
+		if(x + 1 < Main.row) {
+			b = model.square[x+1][y];
+			if(b.checkFilter(filter)) {
+				ambient.add(new Point(x+1, y));
 			}
-		// 右
-		if(x + 1 < Main.row)
-			if(model.square[x+1][y].checkColor(color)) {
-				Point p = new Point(x+1, y);
-				if(available.add(p)) {
-					cheakDig(available, model, p, color, ++num);
-				}
+		}
+		if(y + 1 < Main.column) {
+			b = model.square[x][y+1];
+			if(b.checkFilter(filter)) {
+				ambient.add(new Point(x, y+1));
 			}
-		// 下
-		if(y + 1 < Main.column)
-			if(model.square[x][y+1].checkColor(color)) {
-				Point p = new Point(x, y+1);
-				if(available.add(p)) {
-					cheakDig(available, model, p, color, ++num);
-				}
+		}
+		if(x - 1 >= 0) {
+			b = model.square[x-1][y];
+			if(b.checkFilter(filter)) {
+				ambient.add(new Point(x-1, y));
 			}
-		// 左
-		if(x -1 >= 0)
-			if(model.square[x-1][y].checkColor(color)) {
-				Point p = new Point(x-1, y);
-				if(available.add(p)) {
-					cheakDig(available, model, p, color, ++num);
-				}
-			}
+		}
+	}
 
-		return num;
+	/*
+	 * Get A set of same color ambient a set of ambient
+	 * @available: Return a set of same color ambient a set of block
+	 * @ambient: Input search a set of blocks
+	 * @model: Present board
+	 * */
+	private int checkDig(HashSet<Point> available, HashSet<Point> ambient, Model model) {
+	    HashSet<Point> tmp = new HashSet<Point>();
+
+		for (Iterator<Point> i = ambient.iterator(); i.hasNext();) {
+		    Point p =  i.next();
+		    if(available.add(p)) {
+		    	tmp.add(p);
+		    }
+		}
+
+		for (Iterator<Point> i = tmp.iterator(); i.hasNext();) {
+		    Point p =  i.next();
+		    if(model.square[p.x][p.y].getColor() <= 0)
+		    	return 0;
+
+		    HashSet<Point> nextAmbient = new HashSet<Point>();
+			getAmbientBlock(nextAmbient, model, p, this.color);
+			if(tmp.size() > 0)
+				checkDig(available, nextAmbient, model);
+		}
+		return available.size();
+	}
+
+	/*
+	 * Change color block in ambient. 1 -> 2 -> 3 -> 4 -> 1 -> ...
+	 * @ambient: Input search a set of blocks
+	 * @model: Present board
+	 * */
+	private void changeAmbientBlock(HashSet<Point> ambient, Model model) {
+		int c = 0;
+		for (Iterator<Point> i = ambient.iterator(); i.hasNext();) {
+			Point p =  i.next();
+			Block b = model.square[p.x][p.y];
+
+			c = (b.color > 0) && ++(b.color) > 4 ? b.color % 4 : b.color;
+			b.chengeBlock(c);
+		}
+	}
+
+	/*
+	 * Change color ambient block in available
+	 * @available: a set of dug block
+	 * @model: Present board
+	 * */
+	private void doAmbientBlock(HashSet<Point> available, Model model) {
+	    HashSet<Point> ambient = new HashSet<Point>();
+
+		for (Iterator<Point> i = available.iterator(); i.hasNext();) {
+			Point p =  i.next();
+			getAmbientBlock(ambient, model, p, -1);
+		}
+		changeAmbientBlock(ambient, model);
 	}
 
 	private void doDig(HashSet<Point> available, Model model) {
-		int num = available.size();
 		for (Iterator<Point> i = available.iterator(); i.hasNext();) {
 		    Point p =  i.next();
 		    model.square[p.x][p.y].chengeBlock(0);
 		}
-		model.inc(5 * num);
 	}
 
 	public void Dig(Model model) {
-		int color = this.color;
-		Point point = this.point;
 		HashSet<Point> available = new HashSet<Point>();
-		available.add(point);
-		if(cheakDig(available, model, point, color, 1) > 1)
+		HashSet<Point> ambient = new HashSet<Point>();
+
+		ambient.add(this.point);
+		if(checkDig(available, ambient, model) > 1) {
 			doDig(available, model);
+			doAmbientBlock(available, model);
+			model.inc(5 * available.size());
+		}
+
 	}
 }
-
 
 class TimeLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
 	private DateFormat format;
 	private int limited;
+	private Model model;
 
     public TimeLabel(){
-    	this.setFont(new Font("Dialog",Font.BOLD,24));
-    	limited = 600000;
+    	this(new Model());
+    }
+
+    public TimeLabel(Model m){
+    	this.model = m;
+    	this.setFont(new Font(Main.default_font12, Font.BOLD, model.default_score_size));
+    	limited = model.max_time;
         format = new SimpleDateFormat("mm:ss:SSS");
         Timer t = new Timer();
-        t.schedule(new TimerLabelTask(), 10,1);
+        t.schedule(new TimerLabelTask(), 10, 1);
     }
 
     public void setTime(){
-        this.setText(format.format(limited--));
+        this.setText(format.format(--limited));
     }
 
     class TimerLabelTask extends TimerTask {
@@ -220,6 +309,9 @@ class TimeLabel extends JLabel {
         public void run(){
         	if(limited > 0) {
                 setTime();
+        	} else {
+        		cancel();
+        		System.out.println(limited);
         	}
         }
     }
@@ -228,10 +320,16 @@ class TimeLabel extends JLabel {
 
 class ScoreLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
+	private Model model;
 	private DateFormat format;
 
     public ScoreLabel(){
-        this.setFont(new Font("Dialog",Font.BOLD,24));
+        this(new Model());
+    }
+
+    public ScoreLabel(Model m){
+    	this.model = m;
+        this.setFont(new Font(Main.default_font12 ,Font.BOLD, model.default_score_size));
     }
 
     public void setTime(){
@@ -247,11 +345,53 @@ class ScoreLabel extends JLabel {
     }
 }
 
-
 class StatusLabel extends JLabel {
 	private static final long serialVersionUID = 1L;
+	Model model;
+	Font font;
 
-    public StatusLabel(){
-        this.setFont(new Font("Dialog",Font.BOLD,24));
+	public StatusLabel(){
+    	this("　");
+    }
+
+	public StatusLabel(String text){
+		this(text, new Model());
+	}
+
+	public StatusLabel(String text, Model model){
+		super(text);
+		this.model = model;
+		font = new Font(Main.default_font10, Font.PLAIN, model.default_status_size);
+		this.setFont(font);
+        setForeground(Color.WHITE);
+	}
+}
+
+class StatusBar extends JPanel {
+	private static final long serialVersionUID = 1L;
+
+	Model model;
+	StatusLabel first;
+	StatusLabel second;
+
+    public StatusBar(){
+    	this(new Model());
+    }
+
+    public StatusBar(Model model){
+    	this.model = model;
+    	setLayout(new BorderLayout());
+        first = new StatusLabel();
+        second = new StatusLabel();
+
+        setBackground(Color.BLACK);
+        setForeground(Color.WHITE);
+
+        this.add(first, BorderLayout.NORTH);
+        this.add(second, BorderLayout.SOUTH);
+
+        setOpaque(true);
+        LineBorder border = new LineBorder(Color.WHITE, 4, true);
+        setBorder(border);
     }
 }
