@@ -3,30 +3,57 @@ package monolith;
 import java.util.Observer;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.util.Observable;
+
 
 public class View extends JFrame implements Observer {
 	private static final long serialVersionUID = 1L;
 
+	protected enum WindowPanel {
+		Main,
+		Status,
+		Side;
+	}
+
+	protected enum PanePanel {
+
+	}
+
+	JPanel main = new JPanel();
 	JPanel board = new JPanel();
 	JPanel header = new JPanel();
-	TimeLabel label;
-	ScoreLabel score;
-	MenuBar menubar;
-	StatusBar status;
+	StatusLabel status = new StatusLabel();
+
+	JPanel highscorebar = new JPanel();
+	JPanel scorebar = new JPanel();
+	JPanel buttonbar = new JPanel();
+
+	JLabel score  = new JLabel();
+	JLabel scorel  = new JLabel(" score: ");
+	JLabel highscore = new JLabel();
+	JLabel highscorel = new JLabel(" highscore: ");
+	JButton undo = new JButton();
+	JButton redo = new JButton();
+	JButton restart = new JButton();
+	JButton stop = new JButton();
+	JButton home = new JButton();
+	JButton hint = new JButton();
+	JButton help = new JButton();
+	JButton search = new JButton();
+	TimeLabel time;
+
+	MenuBar menubar = new MenuBar();
+
 	Model model;
 	int width = 0;
 	int height = 0;
 
 	public View (Controller aController) {
 		model = aController.getModel();
-		status = new StatusBar(model);
-		score = new ScoreLabel(model);
-		label = new TimeLabel(model);
-		menubar = new MenuBar();
+		time = new TimeLabel();
 
 		board.setLayout(new GridLayout(Main.column, Main.row));
-		header.setLayout(new GridLayout(1, 6));
 
 		for(int c = 0; c < Main.column; c++){
 			for(int r = 0; r < Main.row; r++) {
@@ -55,27 +82,57 @@ public class View extends JFrame implements Observer {
 
 		createMenu(menubar);
 
-		header.add(new JPanel());
-		header.add(score);
-		header.add(new JPanel());
-		header.add(new JPanel());
-		header.add(label);
-		header.add(new JPanel());
+        setLabel(score, Main.default_font, Main.default_fontsize);
+        setLabel(scorel, Main.default_font, Main.default_fontsize);
+        setLabel(highscore, Main.default_font, Main.default_fontsize);
+        setLabel(highscorel, Main.default_font, Main.default_fontsize);
 
-		this.add(header, BorderLayout.NORTH);
-		this.add(board, BorderLayout.CENTER);
+        status.setPreferredSize(new Dimension(960, 80));
+
+		header.setLayout(new GridLayout(8, 1, -20, -20));
+		header.setPreferredSize(new Dimension(280, 460));
+
+		scorebar.setLayout(new BorderLayout());
+        highscorebar.setLayout(new BorderLayout());
+
+		scorebar.add(scorel, BorderLayout.WEST);
+
+		highscorebar.add(highscorel, BorderLayout.WEST);
+		scorebar.add(score, BorderLayout.EAST);
+		highscorebar.add(highscore, BorderLayout.EAST);
+
+		header.add(scorebar);
+	    scorebar.setBackground(Color.BLACK);
+		header.add(highscorebar);
+	    highscorebar.setBackground(Color.BLACK);
+		header.add(time);
+		time.setBackground(Color.BLACK);
+
+		setPanel(header);
+		setPanel(status);
+
+		time.setIcon(new ImageIcon(model.imgclock));
+
+		main.setLayout(new BorderLayout(15,16));
+		main.add(board);
+
+		this.setLayout(new BorderLayout());
+		this.setSize(new Dimension(960, 540));
+
+		this.add(header, BorderLayout.EAST);
+		this.add(main, BorderLayout.CENTER);
 		this.add(status, BorderLayout.SOUTH);
 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		//j.setUndecorated(true);
 
-
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.addComponentListener(aController);
 		this.setTitle("ダンガンロンパv3 お宝発見！モノリス");
 
 		this.addWindowListener(aController);
-		// コンポーネントの推奨サイズと設定したレイアウトからコンテナーのサイズを決定する
-		pack();
 		setVisible(true);
+		setLabel(status.first, Main.default_font, Main.default_fontsize);
 	}
 
 	private void createMenu(MenuBar menubar) {
@@ -100,16 +157,32 @@ public class View extends JFrame implements Observer {
 		return this.model;
 	}
 
+	private void setPanel(JPanel p) {
+	      LineBorder border = new LineBorder(Color.WHITE, 4, true);
+	      p.setBackground(Color.BLACK);
+	      p.setForeground(Color.WHITE);
+	      p.setOpaque(true);
+          p.setBorder(border);
+	}
+
+	private void setLabel(JLabel l, String font, int size) {
+		l.setForeground(Color.WHITE);
+        l.setFont(new Font(font ,Font.BOLD, size));
+	}
+
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO 自動生成されたメソッド・スタブ
 		score.setText(Integer.toString(((Model)o).getScore()));
+		highscore.setText(Integer.toString(((Model)o).getHighscore()));
 
 		View view = this;
 		Model model = view.getModel();
 		Block square = model.square[0][0];
 		Dimension size = square.getSize();
         Image scaled;
+
+        status.first.setText("aaa");
 
 		for(int c = 0; c < Main.column; c++){
 			for(int r = 0; r < Main.row; r++) {

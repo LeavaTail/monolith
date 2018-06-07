@@ -22,7 +22,7 @@ public class Controller extends WindowAdapter implements ActionListener, Compone
 
 	public void actionPerformed(ActionEvent actionEvent) {
 		if(actionEvent.getActionCommand() == "inc") {
-			model.inc();
+//			model.inc();
 		} else {
 			Block block = (Block)(actionEvent.getSource());
 			block.Dig(model);

@@ -1,6 +1,5 @@
 package monolith;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -8,42 +7,43 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Observable;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 public class Model extends Observable {
-	public int default_status_size = 32;
-	public int default_score_size = 28;
-	public int max_time = 600000; // 制限時間
+	public int max_time = 600000;
 
 	private int score;
+	private int highscore;
+	private int time;
+	private String status1;
+	private String status2;
+
 	Block square[][] = new Block[Main.row][Main.column];
 	public BufferedImage img0;
 	public BufferedImage img1;
 	public BufferedImage img2;
 	public BufferedImage img3;
 	public BufferedImage img4;
-
+	public BufferedImage imgclock;
 
 	public Model() {
-		this(0);
-		initBoard();
+		this(0, 0, " ");
 	}
 
-	public Model(int i) {
-		setScore(i);
+	public Model(int s, int high, String text) {
+		setScore(s);
+		setHighscore(high);
+		setStatus(text);
+		setTime(max_time);
 
 		try {
 			img0 = ImageIO.read(getClass().getResourceAsStream("/zero.png"));
@@ -51,10 +51,20 @@ public class Model extends Observable {
 			img2 = ImageIO.read(getClass().getResourceAsStream("/two.png"));
 			img3 = ImageIO.read(getClass().getResourceAsStream("/three.png"));
 			img4 = ImageIO.read(getClass().getResourceAsStream("/four.png"));
-	    } catch (Exception ex) {
+			imgclock = ImageIO.read(getClass().getResourceAsStream("/clock.png"));
+
+		} catch (Exception ex) {
 		    System.out.println(ex);
 		    System.exit(1);
 		}
+		initGame();
+	}
+
+	public void initGame() {
+		initBoard();
+		time = max_time;
+		setChanged();
+		notifyObservers();
 	}
 
 	public void initBoard() {
@@ -62,15 +72,11 @@ public class Model extends Observable {
 			for(int r = 0; r < Main.row; r++) {
 		      square[r][c] = new Block();
 		      square[r][c].setPoint(r, c);
-		      square[r][c].setPreferredSize(new Dimension(32, 32));
+		      square[r][c].setPreferredSize(new Dimension(36,36));
 		      square[r][c].setBackground(Color.BLACK);
 		      generateRandom(square[r][c], Main.max_colors);
 		    }
 		}
-	}
-
-	public final int getScore() {
-		return score;
 	}
 
 	public void printBoard(Model model) {
@@ -83,33 +89,90 @@ public class Model extends Observable {
 		System.out.println();
 	}
 
+	private void generateRandom(Block b, int range) {
+	    Random rand = new Random();
+		b.setColor(rand.nextInt(range) + 1);
+	}
+
+	/* Score */
+	public final int getScore() {
+		return score;
+	}
+
+	/* Score */
 	public void setScore(int score) {
 		this.score = score;
 		setChanged();
 		notifyObservers();
 	}
 
-	public int inc() {
-		return inc(Main.blockscore);
+	public int incScore() {
+		return incScore(Main.blockscore);
 	}
 
-	public int inc(int score)  {
+	public int incScore(int score)  {
 		setScore(getScore() + score);
 		return getScore();
 	}
 
-	public int dec() {
-		return dec(Main.blockscore);
+	public int decSocre() {
+		return decScore(Main.blockscore);
 	}
 
-	public int dec(int score)  {
+	public int decScore(int score)  {
 		setScore(getScore() - score);
 		return getScore();
 	}
 
-	private void generateRandom(Block b, int range) {
-	    Random rand = new Random();
-		b.setColor(rand.nextInt(range) + 1);
+	/* High Score */
+	public final int getHighscore() {
+		return highscore;
+	}
+
+	public void setHighscore(int hscore) {
+		this.highscore = hscore;
+		setChanged();
+		notifyObservers();
+	}
+
+	/* Time */
+	public final int getTime() {
+		return time;
+	}
+
+	public void setTime(int t) {
+		this.time = t;
+
+	}
+
+	public int decTime() {
+		return decTime(1);
+	}
+
+	public int decTime(int t)  {
+		setTime(getTime() - t);
+		return getTime();
+	}
+
+	/* Status */
+	public final String getStatus() {
+      	StringBuilder buff = new StringBuilder();
+		buff.append(status1);
+		buff.append(status2);
+		return buff.toString();
+	}
+
+	public void setStatus(String text) {
+		int len = text.length();
+    	if(len <= Main.max_text) {
+    		status1 = text;
+    		status2 = "";
+    	} else {
+    		status1 = text.substring(0, Main.max_text-1);
+    		status2 = text.substring(Main.max_text, Main.max_text*2 - 1);
+    	}
+		setChanged();
+		notifyObservers();
 	}
 }
 
@@ -275,9 +338,21 @@ class Block extends JButton {
 		if(checkDig(available, ambient, model) > 1) {
 			doDig(available, model);
 			doAmbientBlock(available, model);
-			model.inc(5 * available.size());
+			model.incScore(5 * available.size());
 		}
 
+	}
+}
+
+class StatusLabel extends JPanel {
+	private static final long serialVersionUID = 1L;
+
+	JLabel first;
+	JLabel second;
+
+	public StatusLabel() {
+		first = new JLabel();
+		second = new JLabel();
 	}
 }
 
@@ -293,9 +368,11 @@ class TimeLabel extends JLabel {
 
     public TimeLabel(Model m){
     	this.model = m;
-    	this.setFont(new Font(Main.default_font12, Font.BOLD, model.default_score_size));
+    	this.setFont(new Font(Main.default_font, Font.BOLD, Main.default_fontsize));
+		this.setForeground(Color.WHITE);
+		this.setVerticalTextPosition(JLabel.CENTER);
     	limited = model.max_time;
-        format = new SimpleDateFormat("mm:ss:SSS");
+        format = new SimpleDateFormat(" mm:ss:SSS");
         Timer t = new Timer();
         t.schedule(new TimerLabelTask(), 10, 1);
     }
@@ -314,84 +391,5 @@ class TimeLabel extends JLabel {
         		System.out.println(limited);
         	}
         }
-    }
-}
-
-
-class ScoreLabel extends JLabel {
-	private static final long serialVersionUID = 1L;
-	private Model model;
-	private DateFormat format;
-
-    public ScoreLabel(){
-        this(new Model());
-    }
-
-    public ScoreLabel(Model m){
-    	this.model = m;
-        this.setFont(new Font(Main.default_font12 ,Font.BOLD, model.default_score_size));
-    }
-
-    public void setTime(){
-        Calendar calendar = Calendar.getInstance(Locale.JAPAN);
-        this.setText(format.format(calendar.getTime()));
-    }
-
-    class TimerLabelTask extends TimerTask {
-
-        public void run(){
-            setTime();
-        }
-    }
-}
-
-class StatusLabel extends JLabel {
-	private static final long serialVersionUID = 1L;
-	Model model;
-	Font font;
-
-	public StatusLabel(){
-    	this("　");
-    }
-
-	public StatusLabel(String text){
-		this(text, new Model());
-	}
-
-	public StatusLabel(String text, Model model){
-		super(text);
-		this.model = model;
-		font = new Font(Main.default_font10, Font.PLAIN, model.default_status_size);
-		this.setFont(font);
-        setForeground(Color.WHITE);
-	}
-}
-
-class StatusBar extends JPanel {
-	private static final long serialVersionUID = 1L;
-
-	Model model;
-	StatusLabel first;
-	StatusLabel second;
-
-    public StatusBar(){
-    	this(new Model());
-    }
-
-    public StatusBar(Model model){
-    	this.model = model;
-    	setLayout(new BorderLayout());
-        first = new StatusLabel();
-        second = new StatusLabel();
-
-        setBackground(Color.BLACK);
-        setForeground(Color.WHITE);
-
-        this.add(first, BorderLayout.NORTH);
-        this.add(second, BorderLayout.SOUTH);
-
-        setOpaque(true);
-        LineBorder border = new LineBorder(Color.WHITE, 4, true);
-        setBorder(border);
     }
 }
