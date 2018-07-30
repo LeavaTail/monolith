@@ -1,5 +1,12 @@
 package model;
 
+import static monolith.MonolithConf.DEFAULT_BLOCK_SIZE;
+import static monolith.MonolithConf.FOUR_IMG;
+import static monolith.MonolithConf.ONE_IMG;
+import static monolith.MonolithConf.THREE_IMG;
+import static monolith.MonolithConf.TWO_IMG;
+import static monolith.MonolithConf.ZERO_IMG;
+
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
@@ -11,7 +18,7 @@ import javax.imageio.ImageIO;
  */
 public enum Color {
 	/** Block color variation. */
-	BROWN(0, "/zero.png"), GRAY(1, "/one.png"), PINK(2, "/two.png"), YELLOW(3, "/three.png"), BLUE(4, "/four.png");
+	BROWN(0, ZERO_IMG), GRAY(1, ONE_IMG), PINK(2, TWO_IMG), YELLOW(3, THREE_IMG), BLUE(4, FOUR_IMG);
 
 	/** Block color number. */
 	private int id;
@@ -33,7 +40,7 @@ public enum Color {
 			this.img = ImageIO.read(getClass().getResourceAsStream(path));
 		} catch (Exception e) {
 			e.printStackTrace();
-			this.img = new BufferedImage(Piece.DEFAULT_SIZE, Piece.DEFAULT_SIZE, BufferedImage.TYPE_INT_BGR);
+			this.img = new BufferedImage(DEFAULT_BLOCK_SIZE, DEFAULT_BLOCK_SIZE, BufferedImage.TYPE_INT_BGR);
 		}
 	}
 

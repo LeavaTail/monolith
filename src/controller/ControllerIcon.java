@@ -1,14 +1,13 @@
 package controller;
 
+import static monolith.MonolithConf.DEFAULT_ICONPATH;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
-
-import model.Piece;
-
 /**
  * The <code>ControllerIcon</code> class handle requests from user. (<b>C</b> of
  * the <b>MVC</b> pattern).
@@ -16,9 +15,6 @@ import model.Piece;
  * @author LeavaTail
  */
 public class ControllerIcon {
-	/** default stored icon file path. */
-	// danganv3/icons/***.png
-	static final String DEFAULT_ICONPATH = "./icons";
 
 	/**
 	 * loaded icon file.
@@ -57,7 +53,7 @@ public class ControllerIcon {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				img = new BufferedImage(Piece.DEFAULT_SIZE, Piece.DEFAULT_SIZE, BufferedImage.TYPE_INT_BGR);
+				img = new BufferedImage(0, 0, BufferedImage.TYPE_INT_BGR);
 			}
 		}
 	}

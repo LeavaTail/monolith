@@ -1,6 +1,7 @@
 package view;
 
-import static view.View.DEFAULT_FONT;
+import static monolith.MonolithConf.DEFAULT_FONT;
+import static monolith.MonolithConf.DEFAULT_FONTSIZE;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -18,7 +19,7 @@ import model.Model;
 public class Text extends JLabel {
 	public Text() {
 		Font font = Model.f.getFont(DEFAULT_FONT);
-		this.setFont(font.deriveFont(Font.PLAIN, 32f));
+		this.setFont(font.deriveFont(Font.PLAIN, DEFAULT_FONTSIZE));
 		this.setForeground(Color.WHITE);
 		this.setBackground(Color.BLACK);
 	}

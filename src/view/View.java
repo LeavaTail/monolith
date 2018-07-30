@@ -1,5 +1,9 @@
 package view;
 
+import static monolith.MonolithConf.DEFAULT_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_WIDTH;
+import static monolith.MonolithConf.GAMETITLE;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.Observable;
@@ -11,7 +15,6 @@ import javax.swing.JMenuBar;
 
 import controller.Controller;
 import model.Model;
-
 /**
  * The <code>View</code> class means presentation of the model in a particular
  * format. (<b>V</b> of the <b>MVC</b> pattern)
@@ -20,20 +23,6 @@ import model.Model;
  */
 @SuppressWarnings("serial")
 public class View extends JFrame implements Observer {
-	public static final int DEFAULT_HEIGHT = 540;
-	public static final int DEFAULT_WIDTH = 960;
-	public static final int DEFAULT_GAME_HEIGHT = 378;
-	public static final int DEFAULT_GAME_WIDTH = 592;
-	public static final int DEFAULT_STATUS_HEIGHT = 100;
-	public static final int DEFAULT_STATUS_WIDTH = 944;
-	public static final int DEFAULT_SIDE_HEIGHT = 378;
-	public static final int DEFAULT_SIDE_WIDTH = 342;
-
-	public static final int MAXLINE = 58;
-	public static final String DEFAULT_FONT = "PixelMplus12";
-	public static final String DEFAULT_ICON = "default";
-	public static final String DEFAULT_CLICK_ICON = "click";
-	public static final int DEFAULT_FONTSIZE = 28;
 
 	/** managing the data of the application. */
 	private Model model;
@@ -60,7 +49,7 @@ public class View extends JFrame implements Observer {
 		this.add(main);
 		setJMenuBar(menubar);
 
-		setTitle("ダンガンロンパv3 お宝発見！モノリス");
+		setTitle(GAMETITLE);
 		setVisible(true);
 	}
 

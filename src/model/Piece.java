@@ -8,11 +8,6 @@ package model;
 @SuppressWarnings("serial")
 public class Piece extends Block {
 	/**
-	 * default piece size.
-	 */
-	public static final int DEFAULT_SIZE = 64;
-
-	/**
 	 * default piece color.
 	 */
 	protected Color color;

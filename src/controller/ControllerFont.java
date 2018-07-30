@@ -1,5 +1,7 @@
 package controller;
 
+import static monolith.MonolithConf.DEFAULT_FONTPATH;
+
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.File;
@@ -14,10 +16,7 @@ import java.util.HashMap;
  * @author LeavaTail
  */
 public class ControllerFont {
-	/** default stored font file path. */
-	// danganv3/fonts/***.ttf
-	private static final String DEFAULT_FONTPATH = "./fonts";
-
+	private String suffix = "ttf";
 	/**
 	 * loaded font file.
 	 * <p>
@@ -75,7 +74,7 @@ public class ControllerFont {
 
 			@Override
 			public boolean accept(File file, String str) {
-				if (str.endsWith("ttf")) {
+				if (str.endsWith(suffix)) {
 					return true;
 				} else {
 					return false;

@@ -1,7 +1,13 @@
 package view;
 
-import static view.View.DEFAULT_CLICK_ICON;
-import static view.View.DEFAULT_ICON;
+import static monolith.MonolithConf.DEFAULT_CLICK_ICON;
+import static monolith.MonolithConf.DEFAULT_ICON;
+import static monolith.MonolithConf.DEFAULT_ICON_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_ICON_WIDTH;
+import static monolith.MonolithConf.DEFAULT_STATUSBAR_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_STATUSBAR_WIDTH;
+import static monolith.MonolithConf.DEFAULT_STATUSTEXT_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_STATUSTEXT_WIDTH;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -30,12 +36,12 @@ public class Status extends Window {
 	public Status() {
 		super(0);
 
-		TextBox text = new TextBox(new Dimension(794, 100));
+		TextBox text = new TextBox(new Dimension(DEFAULT_STATUSTEXT_WIDTH, DEFAULT_STATUSTEXT_HEIGHT));
 		icon = new Icon(Model.i.getIcon(DEFAULT_ICON));
-		icon.setPreferredSize(new Dimension(150, 120));
+		icon.setPreferredSize(new Dimension(DEFAULT_ICON_HEIGHT, DEFAULT_ICON_WIDTH ));
 		icon.setPressedIcon(new ImageIcon(Icon.getScaledImage(Model.i.getIcon(DEFAULT_CLICK_ICON), 150, 120)));
 
-		setPreferredSize(new Dimension(944, 120));
+		setPreferredSize(new Dimension(DEFAULT_STATUSBAR_WIDTH, DEFAULT_STATUSBAR_HEIGHT));
 		setLayout(new BorderLayout());
 
 		add(text, BorderLayout.CENTER);

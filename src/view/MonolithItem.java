@@ -1,6 +1,10 @@
 package view;
 
-import static view.View.DEFAULT_FONT;
+import static monolith.MonolithConf.DEFAULT_FONT;
+import static monolith.MonolithConf.DEFAULT_RANK_FONTSIZE;
+import static monolith.MonolithConf.DEFAULT_RANK_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_RANK_WIDTH;
+import static monolith.MonolithConf.DEFAULT_TIME_FONTSIZE;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,6 +55,14 @@ public class MonolithItem extends Window implements WindowItem {
 	/** default high score label */
 	public static String HIGHSCORE_LABEL = "HighScore: ";
 
+	public static final int DEFAULT_MONOLITHITEM = 4;
+	public static final String DEFAULT_MONOLITHITEM_UNDO = "/undo.png";
+	public static final String DEFAULT_MONOLITHITEM_REDO = "/redo.png";
+	public static final String DEFAULT_MONOLITHITEM_PAUSE = "/pause.png";
+	public static final String DEFAULT_MONOLITHITEM_HOME = "/home.png";
+	public static final int DEFAULT_MAXRANK_NUM = 3;
+	public static final String DEFAULT_MONOLITHITEM_CLOCK = "/clock.png";
+
 	/** generate Window */
 	public MonolithItem() {
 		super();
@@ -96,14 +108,14 @@ public class MonolithItem extends Window implements WindowItem {
 	 * </ul>
 	 */
 	public void setControll() {
-		JButton[] controllButton = new JButton[4];
+		JButton[] controllButton = new JButton[DEFAULT_MONOLITHITEM];
 
-		controllButton[0] = new JButton(new ImageIcon(loadIcon("/undo.png")));
-		controllButton[1] = new JButton(new ImageIcon(loadIcon("/redo.png")));
-		controllButton[2] = new JButton(new ImageIcon(loadIcon("/pause.png")));
-		controllButton[3] = new JButton(new ImageIcon(loadIcon("/home.png")));
+		controllButton[0] = new JButton(new ImageIcon(loadIcon(DEFAULT_MONOLITHITEM_UNDO)));
+		controllButton[1] = new JButton(new ImageIcon(loadIcon(DEFAULT_MONOLITHITEM_REDO)));
+		controllButton[2] = new JButton(new ImageIcon(loadIcon(DEFAULT_MONOLITHITEM_PAUSE)));
+		controllButton[3] = new JButton(new ImageIcon(loadIcon(DEFAULT_MONOLITHITEM_HOME)));
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < DEFAULT_MONOLITHITEM; i++) {
 			controllButton[i].setBackground(Color.BLACK);
 			LineBorder border = new LineBorder(Color.BLACK, 0, true);
 			controllButton[i].setBorder(border);
@@ -121,19 +133,19 @@ public class MonolithItem extends Window implements WindowItem {
 	public void setScore(String text) {
 		Text index = new Text();
 		Text point = new Text();
-		Window rank = new Window(new Dimension(90, 40));
+		Window rank = new Window(new Dimension(DEFAULT_RANK_HEIGHT, DEFAULT_RANK_WIDTH));
 
-		index.setFont(font.deriveFont(Font.BOLD, 24f));
+		index.setFont(font.deriveFont(Font.BOLD, DEFAULT_RANK_FONTSIZE));
 		index.setText(text);
 		index.setHorizontalAlignment(JLabel.LEFT);
 
-		point.setFont(font.deriveFont(Font.BOLD, 24f));
+		point.setFont(font.deriveFont(Font.BOLD, DEFAULT_RANK_FONTSIZE));
 		point.setText(String.valueOf(score.getScore()));
 		point.setHorizontalAlignment(JLabel.LEFT);
 
-		rank.setLayout(new GridLayout(1, 3));
+		rank.setLayout(new GridLayout(1, DEFAULT_MAXRANK_NUM));
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < DEFAULT_MAXRANK_NUM; i++) {
 			rank.add(new JLabel(new ImageIcon(score.getImg(i))));
 		}
 
@@ -146,14 +158,14 @@ public class MonolithItem extends Window implements WindowItem {
 	 * set time label.
 	 */
 	public void setTime() {
-		text.setFont(font.deriveFont(Font.BOLD, 28f));
+		text.setFont(font.deriveFont(Font.BOLD, DEFAULT_TIME_FONTSIZE));
 		text.setVerticalTextPosition(JLabel.CENTER);
 		text.setText(format.format(limited));
 
-		text.setIcon(new ImageIcon(loadIcon("/clock.png")));
+		text.setIcon(new ImageIcon(loadIcon(DEFAULT_MONOLITHITEM_CLOCK)));
 
 		Timer t = new Timer();
-		t.schedule(new TimerLabelTask(), 10, 1);
+		t.schedule(new TimerLabelTask(), 0, 1);
 
 		this.add(text);
 	}

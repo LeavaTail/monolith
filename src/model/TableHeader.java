@@ -1,7 +1,10 @@
 package model;
 
 import static model.Alphabet.upper;
-import static view.View.DEFAULT_FONT;
+import static monolith.MonolithConf.DEFAULT_FONT;
+import static monolith.MonolithConf.DEFAULT_HEADER_FONTSIZE;
+import static monolith.MonolithConf.DEFAULT_HEADER_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_HEADER_WIDTH;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -42,9 +45,9 @@ public class TableHeader extends Window {
 		setLayout(new GridLayout(column, 1));
 		for (int c = 1; c <= column; c++) {
 			Text index = new Text();
-			index.setFont(font.deriveFont(Font.BOLD, 16f));
+			index.setFont(font.deriveFont(Font.BOLD, DEFAULT_HEADER_FONTSIZE));
 			index.setText(c + "");
-			index.setPreferredSize(new Dimension(16, 32));
+			index.setPreferredSize(new Dimension(DEFAULT_HEADER_WIDTH, DEFAULT_HEADER_HEIGHT));
 			index.setHorizontalAlignment(JLabel.RIGHT);
 			this.add(index);
 		}
@@ -61,8 +64,8 @@ public class TableHeader extends Window {
 		for (int r = 0; r < row; r++) {
 			Text index = new Text();
 			index.setText(" " + upper(r - 1));
-			index.setFont(font.deriveFont(Font.BOLD, 16f));
-			index.setPreferredSize(new Dimension(32, 32));
+			index.setFont(font.deriveFont(Font.BOLD, DEFAULT_HEADER_FONTSIZE));
+			index.setPreferredSize(new Dimension(DEFAULT_HEADER_WIDTH, DEFAULT_HEADER_WIDTH));
 			this.add(index);
 		}
 	}

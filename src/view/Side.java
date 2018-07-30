@@ -1,5 +1,24 @@
 package view;
 
+import static monolith.MonolithConf.DEFAULT_SIDEDATA_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDEDATA_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDEEAST_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDEEAST_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDEMAIN_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDEMAIN_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDEMENU_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDEMENU_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDENORTH_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDENORTH_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDESOUTH_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDESOUTH_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDETITLE_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDETITLE_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDEWEST_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_SIDEWEST_WIDTH;
+import static monolith.MonolithConf.DEFAULT_SIDE_MARGIN;
+import static monolith.MonolithConf.DEFAULT_SIZEMAIN_MARGIN;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -8,7 +27,6 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
 import model.Score;
-
 /**
  * <code>Side</code> express Biim layout side bar.
  *
@@ -18,46 +36,51 @@ import model.Score;
 public class Side extends Window {
 	/** monolith score. */
 	private Score score;
+	public static final int DEFAULT_SIDEMENU = 6;
+	public static final int DEFAULT_SIDEMENU_SCORE = 0;
+	public static final int DEFAULT_SIDEMENU_HIGHSCORE = 1;
+	public static final int DEFAULT_SIDEMENU_CONTROLL = 3;
+	public static final int DEFAULT_SIDEMENU_TIME = 5;
 
 	/**
 	 * generate side bar.
 	 */
 	public Side() {
-		super(new Dimension(352, 358), 0);
+		super(new Dimension(DEFAULT_SIDEMAIN_WIDTH, DEFAULT_SIDEMAIN_HEIGHT), 0);
 
 		Window main = new Window();
-		Window title = new Window(new Dimension(330, 60), 4);
-		Window data = new Window(new Dimension(330, 280), 4);
-		Window menu = new Window(new Dimension(310, 260));
+		Window title = new Window(new Dimension(DEFAULT_SIDETITLE_WIDTH, DEFAULT_SIDETITLE_HEIGHT), DEFAULT_SIDE_MARGIN);
+		Window data = new Window(new Dimension(DEFAULT_SIDEDATA_WIDTH, DEFAULT_SIDEDATA_HEIGHT), DEFAULT_SIDE_MARGIN);
+		Window menu = new Window(new Dimension(DEFAULT_SIDEMENU_WIDTH, DEFAULT_SIDEMENU_HEIGHT));
 
 		Text text = new Text();
 		text.setText("デバッグメッセージ");
 		title.add(text);
 
 		setLayout(new BorderLayout());
-		main.setLayout(new BorderLayout(10, 10));
+		main.setLayout(new BorderLayout(DEFAULT_SIZEMAIN_MARGIN, DEFAULT_SIZEMAIN_MARGIN));
 		main.add(title, BorderLayout.NORTH);
 		main.add(data, BorderLayout.CENTER);
 
-		data.addWindow(menu, new Window(new Dimension(0, 10)), new Window(new Dimension(0, 10)),
-				new Window(new Dimension(10, 0)), new Window(new Dimension(10, 0)));
+		data.addWindow(menu, new Window(new Dimension(0, DEFAULT_SIZEMAIN_MARGIN)), new Window(new Dimension(0, DEFAULT_SIZEMAIN_MARGIN)),
+				new Window(new Dimension(DEFAULT_SIZEMAIN_MARGIN, 0)), new Window(new Dimension(DEFAULT_SIZEMAIN_MARGIN, 0)));
 
-		menu.setLayout(new GridLayout(6, 1));
-		MonolithItem[] item = new MonolithItem[6];
-		for (int i = 0; i < 6; i++)
+		menu.setLayout(new GridLayout(DEFAULT_SIDEMENU, 1));
+		MonolithItem[] item = new MonolithItem[DEFAULT_SIDEMENU];
+		for (int i = 0; i < DEFAULT_SIDEMENU; i++)
 			item[i] = new MonolithItem();
-		item[0].setScore(MonolithItem.SCORE_LABEL);
-		item[1].setScore(MonolithItem.HIGHSCORE_LABEL);
-		item[3].setControll();
-		item[5].setTime();
-		for (int i = 0; i < 6; i++)
+		item[DEFAULT_SIDEMENU_SCORE].setScore(MonolithItem.SCORE_LABEL);
+		item[DEFAULT_SIDEMENU_HIGHSCORE].setScore(MonolithItem.HIGHSCORE_LABEL);
+		item[DEFAULT_SIDEMENU_CONTROLL].setControll();
+		item[DEFAULT_SIDEMENU_TIME].setTime();
+		for (int i = 0; i < DEFAULT_SIDEMENU; i++)
 			menu.add(item[i]);
 
 		add(main, BorderLayout.CENTER);
-		add(new Window(new Dimension(12, 378)), BorderLayout.EAST);
-		add(new Window(new Dimension(10, 378)), BorderLayout.WEST);
-		add(new Window(new Dimension(0, 4)), BorderLayout.SOUTH);
-		add(new Window(new Dimension(0, 4)), BorderLayout.NORTH);
+		add(new Window(new Dimension(DEFAULT_SIDEEAST_HEIGHT, DEFAULT_SIDEEAST_WIDTH)), BorderLayout.EAST);
+		add(new Window(new Dimension(DEFAULT_SIDEWEST_HEIGHT, DEFAULT_SIDEWEST_WIDTH)), BorderLayout.WEST);
+		add(new Window(new Dimension(DEFAULT_SIDESOUTH_HEIGHT, DEFAULT_SIDESOUTH_WIDTH)), BorderLayout.SOUTH);
+		add(new Window(new Dimension(DEFAULT_SIDENORTH_HEIGHT, DEFAULT_SIDENORTH_WIDTH)), BorderLayout.NORTH);
 	}
 
 	/**

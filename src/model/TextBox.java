@@ -3,6 +3,10 @@
  */
 package model;
 
+import static monolith.MonolithConf.DEFAULT_TEXTBOX_HEIGHT;
+import static monolith.MonolithConf.DEFAULT_TEXTBOX_MARGIN;
+import static monolith.MonolithConf.DEFAULT_TEXTBOX_WIDTH;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -14,7 +18,6 @@ import javax.swing.border.EtchedBorder;
 
 import view.Text;
 import view.Window;
-
 /**
  * <code>TextBox</code> express text box.
  *
@@ -42,8 +45,8 @@ public class TextBox extends Window {
 	 */
 	public TextBox(Dimension d) {
 		super(d, 0);
-		Window box = new Window(4);
-		Window textBar = new Window(new Dimension(774, 100));
+		Window box = new Window(DEFAULT_TEXTBOX_MARGIN);
+		Window textBar = new Window(new Dimension(DEFAULT_TEXTBOX_WIDTH, DEFAULT_TEXTBOX_HEIGHT));
 
 		box.setLayout(new BorderLayout());
 		setLayout(new BorderLayout());
